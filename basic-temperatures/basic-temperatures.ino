@@ -13,6 +13,7 @@ uint32_t rawValues[NUM_THERMISTORS] = {};
 float voltages[NUM_THERMISTORS] = {};
 float resistances[NUM_THERMISTORS] = {};
 float temperatures[NUM_THERMISTORS] = {};
+float averageTemperature = 0;
 
 esp_adc_cal_characteristics_t adc_chars;
 
@@ -36,6 +37,13 @@ void loop() {
         temperatures[i] = 1.0 / (1.0 / (NOMINAL_TEMPERATURE + 273.15) +
                      (1.0 / B_COEFFICIENT) * log(resistances[i] / NOMINAL_RESISTANCE));
         temperatures[i] -= 273.15; // Convert from Kelvin to Celsius
+
+        // get average temp
+        averageTemperature = 0;
+        for (int j = 0; j < NUM_THERMISTORS; j++) {
+            averageTemperature += temperatures[j];
+        }
+        averageTemperature = averageTemperature / NUM_THERMISTORS;
 
         Serial.print("sensor: ");
         Serial.print(i);
