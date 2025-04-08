@@ -1,3 +1,6 @@
+#include <Adafruit_SSD1306.h>
+#include <splash.h>
+
 #include <esp_adc_cal.h>
 
 #define SERIES_RESISTOR 10000  // 10kΩ pull-up resistor
@@ -17,7 +20,26 @@ float averageTemperature = 0;
 
 esp_adc_cal_characteristics_t adc_chars;
 
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 void setup() {
+    Wire.begin(8, 9); // SDA = GPIO8, SCL = GPIO9
+
+      // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
+        Serial.println(F("SSD1306 allocation failed"));
+        for(;;); // Don't proceed, loop forever
+    }
+
+    display.clearDisplay();
+    display.setTextSize(1);      // Normal 1:1 pixel scale
+    display.setTextColor(WHITE); // Draw white text
+    display.setCursor(0, 0);     // Start at top-left corner
+    display.cp437(true);         // Use full 256 char 'Code Page 437' font
+    display.write("Cyber Still");
+
     Serial.begin(115200);
     // analogReadResolution(13);
     esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_13, 1100, &adc_chars);
